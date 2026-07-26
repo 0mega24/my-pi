@@ -1,0 +1,9 @@
+{
+  "packages": [],
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-sonnet-4-5",
+  "defaultThinkingLevel": "medium",
+  "defaultProjectTrust": "ask",
+  "lastChangelogVersion": "0.82.1",
+  "theme": "dark"
+}

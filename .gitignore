@@ -1,0 +1,40 @@
+# Secrets / machine-local auth
+.env
+.env.*
+!.env.example
+auth.json
+trust.json
+
+# Session history and generated artifacts
+sessions/
+workflows/
+logs/
+*.log
+
+# Provider/model caches and generated state
+models-store.json
+models.json.cache
+
+# Dependencies / package install caches
+node_modules/
+npm/
+git/
+
+# Local package-manager noise
+.pnpm-store/
+.yarn/
+
+# Backups / disabled experiments
+*.disabled/
+*.disabled.*
+extensions.disabled.*/
+skills.disabled.*/
+themes.disabled.*/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
