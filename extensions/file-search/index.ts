@@ -9,7 +9,7 @@
  * before executing, and report a clear error if it failed.
  */
 
-import { NodeServices } from "@effect/platform-node";
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import type {
   AgentToolResult,
   ExtensionAPI,

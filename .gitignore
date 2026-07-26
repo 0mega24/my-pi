@@ -6,9 +6,9 @@ auth.json
 trust.json
 
 # Session history and generated artifacts
-sessions/
-workflows/
-logs/
+/sessions/
+/workflows/
+/logs/
 *.log
 
 # Provider/model caches and generated state
