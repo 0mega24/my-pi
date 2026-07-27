@@ -1,0 +1,13 @@
+{
+  "name": "local-inspect-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit -p .",
+    "format": "prettier --write \"**/*.{ts,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,json}\""
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

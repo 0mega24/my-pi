@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { spawn, type ChildProcess } from "node:child_process";
+import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { safeStringify, toSerializable } from "./serialization.ts";
@@ -73,6 +73,42 @@ function sanitizeAgentOptions(value: unknown): SandboxAgentOptions {
   };
 }
 
+function nodeSupportsPermission(executable: string) {
+  const probe = spawnSync(
+    executable,
+    ["-p", "process.allowedNodeEnvironmentFlags.has('--permission')"],
+    {
+      env: { PATH: process.env.PATH ?? "" },
+      encoding: "utf8",
+      timeout: 2_000,
+      windowsHide: true,
+    },
+  );
+  return probe.status === 0 && probe.stdout.trim() === "true";
+}
+
+function resolvePermissionNode() {
+  if (process.allowedNodeEnvironmentFlags.has("--permission")) {
+    return process.execPath;
+  }
+
+  const candidates = [
+    process.env.PI_WORKFLOW_NODE,
+    process.env.NODE,
+    "node",
+    "/usr/bin/node",
+    "/usr/sbin/node",
+  ].filter((candidate): candidate is string => Boolean(candidate));
+
+  for (const candidate of [...new Set(candidates)]) {
+    if (nodeSupportsPermission(candidate)) return candidate;
+  }
+
+  throw new Error(
+    "This runtime cannot enforce workflow child permissions, and no Node executable with --permission support was found. Set PI_WORKFLOW_NODE to a Node 20+ binary.",
+  );
+}
+
 /**
  * Execute orchestration code in a separate, permission-restricted Node process.
  * The child can only invoke the narrow agent/phase IPC protocol and is always
@@ -81,11 +117,13 @@ function sanitizeAgentOptions(value: unknown): SandboxAgentOptions {
  * are aborted only when the workflow is cancelled or the sandbox is cleaned up.
  */
 export function runWorkflowSandbox(options: RunWorkflowSandboxOptions) {
-  if (!process.allowedNodeEnvironmentFlags.has("--permission")) {
-    return Promise.reject(
-      new Error("This Node runtime cannot enforce workflow child permissions"),
-    );
+  let nodePath: string;
+  try {
+    nodePath = resolvePermissionNode();
+  } catch (error) {
+    return Promise.reject(error);
   }
+
   if (byteLength(options.source) > MAX_SOURCE_BYTES) {
     return Promise.reject(
       new Error(`Workflow script exceeds the ${MAX_SOURCE_BYTES} byte limit`),
@@ -105,7 +143,7 @@ export function runWorkflowSandbox(options: RunWorkflowSandboxOptions) {
       new URL("./sandbox-child.cjs", import.meta.url),
     );
     const child = spawn(
-      process.execPath,
+      nodePath,
       [
         "--permission",
         `--allow-fs-read=${path.dirname(workerPath)}`,

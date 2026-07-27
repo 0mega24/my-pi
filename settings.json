@@ -1,9 +1,16 @@
 {
-  "packages": [],
+  "packages": [
+    "npm:bigpowers",
+    "npm:@pi-plugins/usage",
+    "npm:pi-lens",
+    "npm:pi-web-access",
+    "npm:@mjasnikovs/pi-task"
+  ],
   "defaultProvider": "anthropic",
   "defaultModel": "claude-sonnet-4-5",
   "defaultThinkingLevel": "medium",
-  "defaultProjectTrust": "ask",
+  "defaultProjectTrust": "always",
   "lastChangelogVersion": "0.82.1",
-  "theme": "github-dark-default"
+  "theme": "github-dark-default",
+  "hideThinkingBlock": false
 }
